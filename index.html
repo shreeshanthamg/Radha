@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RadhaMadeTube</title>
+  <title>RadhaMadeTube | Jai Shri Radhe 🌸</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -69,6 +69,15 @@
       border: 1px solid #aaa;
     }
 
+    img.maharaj {
+      max-width: 200px;
+      width: 40%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+    }
+
     @media (max-width: 600px) {
       h1 {
         font-size: 8vw;
@@ -81,13 +90,19 @@
   </style>
 </head>
 <body>
+
+  <!-- 🙏 Premanand Ji Maharaj Image -->
+  <img 
+    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Premanand_Maharaj_Ji.jpg/440px-Premanand_Maharaj_Ji.jpg" 
+    alt="Premanand Ji Maharaj" 
+    class="maharaj" />
+
   <h1>🎬 RadhaMadeTube</h1>
 
-  <!-- 🔍 Input box to paste video or Shorts link -->
+  <!-- 🔍 Input to Paste Video or Shorts Link -->
   <input type="text" id="videoLink" placeholder="Paste YouTube link here (normal or Shorts)" />
 
   <div id="videoContainer">
-    <!-- YouTube iframe will appear here -->
     <iframe id="youtubeFrame"
       src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1"
       frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
@@ -110,7 +125,7 @@
     // Load saved notes
     notesBox.value = localStorage.getItem('radhatube_notes') || "";
 
-    // Save notes automatically
+    // Auto-save notes
     notesBox.addEventListener('input', () => {
       localStorage.setItem('radhatube_notes', notesBox.value);
     });
@@ -132,7 +147,7 @@
       link.click();
     }
 
-    // Extract Video ID and embed it
+    // Extract Video ID from URL
     videoInput.addEventListener("change", () => {
       const url = videoInput.value;
       const videoId = extractVideoID(url);
@@ -143,7 +158,6 @@
       }
     });
 
-    // Function to extract YouTube video ID (from normal or Shorts links)
     function extractVideoID(url) {
       const shortRegex = /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/;
       const longRegex = /(?:v=|\/embed\/)([a-zA-Z0-9_-]{11})/;
@@ -159,6 +173,7 @@
       return null;
     }
   </script>
+
 </body>
 </html>
 
