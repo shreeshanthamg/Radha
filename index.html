@@ -1,94 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RadhaMadeTube</title>
   <style>
     body {
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #1e1e2f;
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       padding: 20px;
+      background-color: #f0f8ff;
+      text-align: center;
     }
+
     h1 {
-      color: #ffca28;
-    }
-    input[type="text"] {
-      width: 80%;
-      max-width: 600px;
-      padding: 10px;
+      font-size: 6vw;
       margin-bottom: 20px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
     }
+
+    iframe {
+      width: 100%;
+      max-width: 800px;
+      aspect-ratio: 16/9;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.15);
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 800px;
+      height: 200px;
+      font-size: 16px;
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+
+    .buttons {
+      margin-top: 10px;
+    }
+
     button {
-      padding: 10px 20px;
-      background-color: #ffca28;
+      background-color: #007acc;
+      color: white;
       border: none;
+      padding: 10px 20px;
+      margin: 8px;
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
-      color: #333;
     }
-    iframe {
-      width: 100%;
-      max-width: 960px;
-      height: 540px;
-      border: none;
-      margin-top: 30px;
-      border-radius: 12px;
+
+    button:hover {
+      background-color: #005fa3;
     }
-    .note-area {
+
+    input[type="text"] {
       width: 100%;
-      max-width: 960px;
-      margin-top: 30px;
-    }
-    textarea {
-      width: 100%;
-      height: 150px;
+      max-width: 600px;
       padding: 10px;
+      margin: 20px auto;
+      font-size: 16px;
       border-radius: 8px;
-      border: none;
-      font-size: 14px;
-      background-color: #2e2e3f;
-      color: white;
+      border: 1px solid #aaa;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 8vw;
+      }
+
+      textarea {
+        height: 180px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>🎓 RadhaMadeTube</h1>
-  <p>Paste a YouTube link to watch distraction-free 📽️</p>
-  <input id="ytLink" type="text" placeholder="Paste YouTube video URL here...">
-  <button onclick="loadVideo()">Play Video</button>
-  <iframe id="player" src="" allowfullscreen></iframe>
+  <h1>🎬 RadhaMadeTube</h1>
 
-  <div class="note-area">
-    <h2>📝 Your Notes</h2>
-    <textarea placeholder="Write your thoughts or take notes here..."></textarea>
+  <!-- 🔍 Input box to paste video or Shorts link -->
+  <input type="text" id="videoLink" placeholder="Paste YouTube link here (normal or Shorts)" />
+
+  <div id="videoContainer">
+    <!-- YouTube iframe will appear here -->
+    <iframe id="youtubeFrame"
+      src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1"
+      frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+    </iframe>
+  </div>
+
+  <h2>📝 Your Notes</h2>
+  <textarea id="notes" placeholder="Write your thoughts or timestamps here..."></textarea>
+
+  <div class="buttons">
+    <button onclick="downloadNotes()">⬇️ Download Notes</button>
+    <button onclick="clearNotes()">🗑️ Clear Notes</button>
   </div>
 
   <script>
-    function extractVideoID(url) {
-      const regExp = /^.*(?:youtu\.be\/|v=)([^#&?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[1].length == 11) ? match[1] : null;
+    const notesBox = document.getElementById('notes');
+    const videoInput = document.getElementById('videoLink');
+    const iframe = document.getElementById('youtubeFrame');
+
+    // Load saved notes
+    notesBox.value = localStorage.getItem('radhatube_notes') || "";
+
+    // Save notes automatically
+    notesBox.addEventListener('input', () => {
+      localStorage.setItem('radhatube_notes', notesBox.value);
+    });
+
+    // Clear notes
+    function clearNotes() {
+      if (confirm("Are you sure you want to clear your notes?")) {
+        notesBox.value = "";
+        localStorage.removeItem('radhatube_notes');
+      }
     }
 
-    function loadVideo() {
-      const input = document.getElementById('ytLink').value;
-      const videoID = extractVideoID(input);
-      if (videoID) {
-        document.getElementById('player').src = `https://www.youtube-nocookie.com/embed/${videoID}`;
+    // Download notes
+    function downloadNotes() {
+      const blob = new Blob([notesBox.value], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "radhatube_notes.txt";
+      link.click();
+    }
+
+    // Extract Video ID and embed it
+    videoInput.addEventListener("change", () => {
+      const url = videoInput.value;
+      const videoId = extractVideoID(url);
+      if (videoId) {
+        iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
       } else {
-        alert('Invalid YouTube URL. Please try again.');
+        alert("Could not extract a valid video ID from the URL.");
       }
+    });
+
+    // Function to extract YouTube video ID (from normal or Shorts links)
+    function extractVideoID(url) {
+      const shortRegex = /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/;
+      const longRegex = /(?:v=|\/embed\/)([a-zA-Z0-9_-]{11})/;
+      const youtuBeRegex = /youtu\.be\/([a-zA-Z0-9_-]{11})/;
+
+      const shortMatch = url.match(shortRegex);
+      const longMatch = url.match(longRegex);
+      const youtuBeMatch = url.match(youtuBeRegex);
+
+      if (shortMatch) return shortMatch[1];
+      if (longMatch) return longMatch[1];
+      if (youtuBeMatch) return youtuBeMatch[1];
+      return null;
     }
   </script>
 </body>
 </html>
+
